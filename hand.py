@@ -6,7 +6,7 @@ class Hand(list):
     def __init__(self, *args, size=5):
         if args:
             if len(args) != size:
-                raise ValueError('Need to pass in 5 values!')
+                raise ValueError('Need to pass in {} values!'.format(size))
             else:
                 for arg in args:
                     self.append(D6(arg))
@@ -34,3 +34,4 @@ class Hand(list):
 if __name__ == '__main__':
     hand = Hand()
     print(hand)
+    print(hand.ones)

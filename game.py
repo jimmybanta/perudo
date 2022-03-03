@@ -1,5 +1,8 @@
 import random
+import math
+
 from ai_gen_zero import ai_gen_zeropointzero
+
 
 from player import Player, AIPlayer
 
@@ -130,10 +133,51 @@ class Round:
 
     def score(self, bet):
         # returns if a bet is true
-        quantity = bet[0]
-        value = bet[1]
+        quantity, value = bet[0], bet[1]
+
+        ones = self.all_dice.count(1)
+        others = self.all_dice.count(value)
         
-        return True if self.all_dice.count(value) >= quantity else False
+        return True if ones + others >= quantity else False
+    
+    def legal_move(self, current, next):
+        # returns whether a move is legal or not
+        current_quantity, current_value = current[0], current[1]
+        next_quantity, next_value = next[0], next[1]
+
+        if current_value == 1:
+            if next_value > 1:
+                return True if next_quantity >= ((current_quantity * 2) + 1) else False
+            elif next_value == 1:
+                return True if next_quantity >= (current_quantity + 1) else False
+            
+        elif current_value > 1:
+            if next_value == 1:
+                return True if next_quantity >= (math.ceil(current_quantity / 2)) else False
+            elif next_value > 1:
+                if next_value > current_value:
+                    return True if next_quantity >= current_quantity else False
+                elif next_value <= current_value:
+                    return True if next_quantity > current_quantity else False
+
+
+    def test_moves(self, move1=False, move2=False):
+        if move1 and move2:
+            current_move = (move1[0], move1[1])
+            next_move = (move2[0], move2[1])
+        else:
+            current_move = (random.randint(1,6), random.randint(1,6))
+            next_move = (random.randint(1,6), random.randint(1,6))
+
+        print("Current move: {} {}'s".format(current_move[0], current_move[1]))
+        print("Next move: {} {}'s".format(next_move[0], next_move[1]))
+
+        truth = True if self.legal_move(current_move, next_move) else False
+
+        print('Legal!') if truth else print('ILLEGAL')
+        print('')
+
+
 
     def loser(self, bet, calling_player, betting_player):
         return calling_player if self.score(bet) else betting_player
@@ -149,10 +193,6 @@ if __name__ == '__main__':
 
     game = Game(5)
     round = Round(game.players, game.order)
-    print([str(player) for player in round.order])
-    print('')
-    print(round.all_dice)
-    print('')
-    round.run()
-
-
+    
+    for _ in range(20):
+        round.test_moves()

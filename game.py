@@ -6,7 +6,7 @@ from ai_gen_zero import ai_gen_zeropointzero
 
 from player import Player, AIPlayer
 
-NO_DICE = 1
+NO_DICE = 2
 
 class Game:
     def __init__(self, num_players, human=False):
@@ -39,8 +39,10 @@ class Game:
     
     def play(self):
         input('Welcome to perudo! You know the rules...')
+        round_num = 0
 
         while not self.check_end():
+            round_num += 1
             input('start of round... ')
 
             for player in self.players:
@@ -49,7 +51,8 @@ class Game:
             print('')
             print('order: {}'.format([str(player) for player in self.order]))
             print('')
-            round = Round(self.players, self.order)
+            if round_num == 1:
+                round = Round(self.players, self.order)
             print('Dice: {}'.format(round.all_dice))
             round.run()
             print('Loser: {}'.format(round.final_loser))
@@ -75,7 +78,6 @@ class Game:
     def update_order(self):
         # run at the end of each round to clear out any players with no more dice
         # add something about keeping track of who loses, for the purposes of data
-
         self.order = [player for player in self.order if player.dice > 0]
     
     def check_winner(self):
@@ -108,8 +110,14 @@ class Round:
         # keep track of bets - to be used later
         self.bets = []
 
-    def start(self):
+    def start(self, straight=False):
         first = self.order[0]
+        if straight:
+            if first.ai:
+                return first.starting_bet(self.average / 2)
+            else:
+                return self.input_start()
+
         if first.ai:
             return first.starting_bet(self.average)
         else:
@@ -185,6 +193,13 @@ class Round:
         
         return True if ones + others >= quantity else False
     
+    def straight_score(self, bet):
+        quantity, value = bet[0], bet[1]
+
+        others = self.all_dice.count(value)
+        
+        return True if others >= quantity else False
+    
     def legal_move(self, current, next):
         # returns whether a move is legal or not
         current_quantity, current_value = current[0], current[1]
@@ -205,6 +220,24 @@ class Round:
                 elif next_value <= current_value:
                     return True if next_quantity > current_quantity else False
 
+    def straight_legal_move(self, current, next, player):
+        player_straight = False
+        if player.dice == 1:
+            player_straight = True
+
+        current_quantity, current_value = current[0], current[1]
+        next_quantity, next_value = next[0], next[1]
+
+        if player_straight:
+            if next_value > current_value:
+                return True if next_quantity >= current_quantity else False
+            elif next_value <= current_value:
+                return True if next_quantity > current_quantity else False
+        else:
+            if next_value != current_value:
+                return False
+            else:
+                return True if next_quantity > current_quantity else False
 
     def test_moves(self, move1=False, move2=False):
         if move1 and move2:
@@ -225,9 +258,6 @@ class Round:
 
     def loser(self, bet, calling_player, betting_player):
         return calling_player if self.score(bet) else betting_player
-
-    def check_winner_turn(self, betting_player, calling_player):
-        pass
         
 
 

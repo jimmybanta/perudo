@@ -28,6 +28,27 @@ class ai_gen_zeropointzero(AIPlayer):
             if value == 6:
                 quantity += 1
             return (quantity, d[d.index(value) + 1])
+    
+    def straight_bet(self, current_bet):
+        quantity = current_bet[0]
+        value = current_bet[1]
+
+        d = [2,3,4,5,6,2]
+
+        if random.random() < .2:
+            return False
+
+        elif self.one_left:
+            if value == 6:
+                quantity += 1
+            return (quantity, d[d.index(value) + 1])
+        else:
+            return (quantity + 1, value)
+    
+    def choose_direction(self):
+        # True = right, False = left
+        return 'right' if random.random() < .5 else 'left'
+            
 
 
 if __name__ == '__main__':

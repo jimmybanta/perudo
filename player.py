@@ -8,6 +8,7 @@ class Player:
         self.dice = dice
         self.ai = ai
         self.gen = gen
+        self.one_left = True if self.dice == 1 else False
     
     def roll(self):
         self.hand = Hand(size=self.dice)

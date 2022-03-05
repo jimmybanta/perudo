@@ -6,27 +6,29 @@ from ai_gen_zero import ai_gen_zeropointzero
 
 from player import Player, AIPlayer
 
-NO_DICE = 5
+NO_DICE = 1
 
 class Game:
-    def __init__(self, num_players, human=True):
+    def __init__(self, num_players, human=False):
         self.players = {}
         self.order = []
+        self.winner = None
+        self.winner_dice = 0
         
         if human:
             for i in range(num_players - 1):
-                ai_player = ai_gen_zeropointzero(i + 1)
+                ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
                 self.players[ai_player] = NO_DICE
                 self.order.append(ai_player)
             name = input('What is your name? ')
-            human_player = Player(name)
+            human_player = Player(name, dice=NO_DICE)
             self.players[human_player] = NO_DICE
             self.order.append(human_player)
             
             
         else:
             for i in range(num_players):
-                ai_player = ai_gen_zeropointzero(i + 1)
+                ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
                 self.players[ai_player] = NO_DICE
                 self.order.append(ai_player)
         
@@ -37,24 +39,51 @@ class Game:
     
     def play(self):
         input('Welcome to perudo! You know the rules...')
-        input('Rolling... ')
 
-        while self.check_end == False:
-            
-            pass
+        while not self.check_end():
+            input('start of round... ')
 
+            for player in self.players:
+                print('Player: {}'.format(str(player)))
+                print('Dice: {}'.format(self.players[player]))
+            print('')
+            print('order: {}'.format([str(player) for player in self.order]))
+            print('')
+            round = Round(self.players, self.order)
+            print('Dice: {}'.format(round.all_dice))
+            round.run()
+            print('Loser: {}'.format(round.final_loser))
+            self.end_round(round.final_loser)
+            self.update_order()
+            print('')
+        print('Game Over!')
+        self.check_winner()
+        print('Winner: {} with {} dice'.format(self.winner, self.winner_dice))
+        
+        
+
+        
+    def end_round(self, player):
+        self.players[player] -= 1
+        player.dice -= 1
 
 
     def check_end(self):
         players = [x for x in self.players if self.players[x] != 0]
         return False if len(players) >= 2 else True
         
-    def update_players(self):
+    def update_order(self):
         # run at the end of each round to clear out any players with no more dice
         # add something about keeping track of who loses, for the purposes of data
 
-        self.players = {key:value for key, value in self.players.items() if value > 0}
         self.order = [player for player in self.order if player.dice > 0]
+    
+    def check_winner(self):
+        # updates self.winner and self.winner_dice 
+        self.winner = self.order[0]
+        self.winner_dice = self.winner.dice
+        
+
 
 
 
@@ -74,18 +103,36 @@ class Round:
 
         self.average = self.total_dice / 3
 
+        self.final_loser = None
+
         # keep track of bets - to be used later
         self.bets = []
 
     def start(self):
         first = self.order[0]
         if first.ai:
-            return(first.starting_bet(6.66))
+            return first.starting_bet(self.average)
         else:
+            return self.input_start()
+    
+    def input_start(self):
+        quantity = int(input('What quantity do you choose? '))
+        value = int(input('what value do you choose? '))
+        return (quantity, value)
+    
+    def input_later(self, bet):
+        quantity = input('What quantity do you choose? (Or type call to call) ')
+        if quantity.lower() == 'call':
+            return False
+        value = int(input('what value do you choose? '))
+        new_bet = (int(quantity), value)
+        while not self.legal_move(bet, new_bet):
             quantity = int(input('What quantity do you choose? '))
             value = int(input('what value do you choose? '))
-            return (quantity, value)
-    
+            bet = (quantity, value)
+        return bet
+
+
     def run(self):
         betting_player = self.order[0]
         first_bet = self.start()
@@ -98,9 +145,7 @@ class Round:
 
         calling_player = self.order[turn % len(self.order)]
         if not calling_player.ai:
-            quantity = int(input('What quantity do you choose? '))
-            value = int(input('what value do you choose? '))
-            bet = (quantity, value)
+            bet = self.input_later(first_bet)
         else:
             bet = calling_player.bet(first_bet)
 
@@ -114,9 +159,7 @@ class Round:
 
             calling_player = self.order[turn % len(self.order)]
             if not calling_player.ai:
-                quantity = int(input('What quantity do you choose? '))
-                value = int(input('what value do you choose? '))
-                bet = (quantity, value)
+                bet = self.input_later(bet)
             else:
                 bet = calling_player.bet(bet)
             
@@ -128,8 +171,10 @@ class Round:
         print('Calling player: {}'.format(str(calling_player)))
 
         print('Bet is {}'.format(self.score(bet)))
+
+        self.final_loser = self.loser(bet, calling_player, betting_player)
         
-        print('Loser: {}'.format(self.loser(bet, calling_player, betting_player)))
+        print('Loser: {}'.format(self.final_loser))
 
     def score(self, bet):
         # returns if a bet is true
@@ -178,11 +223,9 @@ class Round:
         print('')
 
 
-
     def loser(self, bet, calling_player, betting_player):
         return calling_player if self.score(bet) else betting_player
 
-    
     def check_winner_turn(self, betting_player, calling_player):
         pass
         
@@ -191,8 +234,7 @@ class Round:
 
 if __name__ == '__main__':
 
-    game = Game(5)
-    round = Round(game.players, game.order)
+    game = Game(5, human=True)
+    game.play()
     
-    for _ in range(20):
-        round.test_moves()
+    

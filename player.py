@@ -20,9 +20,9 @@ class Player:
 
 
 class AIPlayer(Player):
-    def __init__(self, name, gen='ai'):
+    def __init__(self, name, gen='ai', dice=5):
         self.name = 'Player {}'.format(name)
-        super().__init__(name=self.name, ai=True, gen=gen)
+        super().__init__(name=self.name, ai=True, gen=gen, dice=dice)
     
     
     

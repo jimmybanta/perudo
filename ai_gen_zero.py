@@ -11,9 +11,10 @@ class ai_gen_zeropointzero(AIPlayer):
 
 
     def starting_bet(self, average):
-        quantity = math.floor(average - 2)
-        if quantity < 1:
-            quantity = 1
+        # quantity = math.floor(average - 2)
+        # if quantity < 1:
+        #    quantity = 1
+        quantity = 1
         value = random.randint(2,6)
         return (quantity, value)
 

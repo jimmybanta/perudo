@@ -9,6 +9,7 @@ from player import Player, AIPlayer
 NO_DICE = 2
 
 class Game:
+
     def __init__(self, num_players, human=False):
         self.players = {}
         self.order = []
@@ -33,6 +34,8 @@ class Game:
                 self.order.append(ai_player)
         
         random.shuffle(self.order)
+
+        self.temp_order = self.order.copy()
         
         self.total_dice = sum(self.players.values())
 

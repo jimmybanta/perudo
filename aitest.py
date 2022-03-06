@@ -4,7 +4,7 @@ import pdb
 from game import Game, Round
 from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
-NO_DICE = 5
+NO_DICE = 1
 
 class AITest(Game):
     '''So that I can watch AI's play a game'''
@@ -25,6 +25,8 @@ class AITest(Game):
             self.order.append(player)
         
         random.shuffle(self.order)
+
+        self.temp_order = self.order.copy()
         
         self.total_dice = sum(self.players.values())
 
@@ -92,7 +94,7 @@ class AITest(Game):
         print('Winner: {} with {} dice'.format(self.winner, self.winner_dice))
     
     def set_order(self, player, direction=False):
-        # direction == True -> right, direction == False -> left
+        # sets the order for a round, given the first player
         round_order = []
         if not direction:
             direction = player.choose_direction()

@@ -20,7 +20,6 @@ class AIGame(AITest):
             
         for player in self.ais:
             self.players[player] = NO_DICE
-            self.order.append(player)
         
         self.total_dice = sum(self.players.values())
         
@@ -77,7 +76,6 @@ class AIGame(AITest):
                 else:
                     first_player = loser
                 
-
                 self.update_order()
 
             if game_num % 1000 == 0:
@@ -95,6 +93,13 @@ class AIGame(AITest):
         print('')
 
 
+
+
+
+
+
+
+
 class AIGame_Round(AITest_Round):
     def run(self):
         betting_player = self.order[0]
@@ -106,6 +111,7 @@ class AIGame_Round(AITest_Round):
 
         calling_player = self.order[turn % len(self.order)]
         bet = calling_player.bet(first_bet)
+        
 
         while bet:
             self.bets.append(bet)
@@ -115,6 +121,7 @@ class AIGame_Round(AITest_Round):
 
             calling_player = self.order[turn % len(self.order)]
             bet = calling_player.bet(bet)
+        
             
         bet = self.bets[-1]
     
@@ -158,7 +165,7 @@ if __name__ == '__main__':
 
     game.play(1000)
 
-
+    game.print_results()
 
 
 

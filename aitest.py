@@ -2,13 +2,31 @@ import random
 import pdb
 
 from game import Game, Round
+from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
-
+NO_DICE = 5
 
 class AITest(Game):
     '''So that I can watch AI's play a game'''
-    def __init__(self, num_players):
-        super().__init__(num_players, human=False)
+    def __init__(self):
+        self.players = {}
+        self.order = []
+        self.winner = None
+        self.winner_dice = 0
+
+        self.ais = [ai_gen_zeropointzero(dice=NO_DICE), 
+                    ai_gen_zeropointone(dice=NO_DICE), 
+                    ai_gen_zeropointtwo(dice=NO_DICE),
+                    ai_gen_zeropointthree(dice=NO_DICE), 
+                    ai_gen_zeropointfour(dice=NO_DICE)]
+            
+        for player in self.ais:
+            self.players[player] = NO_DICE
+            self.order.append(player)
+        
+        random.shuffle(self.order)
+        
+        self.total_dice = sum(self.players.values())
 
     
     def play(self):
@@ -40,8 +58,6 @@ class AITest(Game):
                 order = new_order[0]
             round = AITest_Round(self.players, order)
             
-            print(direction)
-            print(first_player)
             print('')
             print('Round order: {}'.format(self.print(order)))
             print('')
@@ -59,9 +75,7 @@ class AITest(Game):
             self.end_round(loser)
 
             if loser.dice == 0:
-                print('SHIFTING')
                 temp_order = self.set_order(loser, direction=direction)[0]
-                print(self.print(temp_order))
                 first_player = temp_order[1]
             elif loser.dice == 1:
                 straight = True
@@ -69,7 +83,6 @@ class AITest(Game):
             else:
                 first_player = loser
             
-            print('First player {}'.format(str(first_player)))
 
             self.update_order()
             print('')
@@ -178,7 +191,7 @@ class AITest_Round(Round):
 
 
 if __name__ == "__main__":
-    game = AITest(5)
+    game = AITest()
 
     game.play()
 

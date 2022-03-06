@@ -1,21 +1,26 @@
 import random
 
-from aitest import AITest, AITest_Round
-from ai_gen_zero import ai_gen_zeropointzero
+from aitest import AITest, AITest_Round, NO_DICE
+from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
-NO_DICE = 5
 
 
 class AIGame(AITest):
-    def __init__(self, num_players):
+    def __init__(self):
         self.players = {}
         self.order = []
         self.winner = None
         self.winner_dice = 0
         
-        for i in range(num_players):
-            ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
-            self.players[ai_player] = NO_DICE
+        self.ais = [ai_gen_zeropointzero(dice=NO_DICE), 
+                    ai_gen_zeropointone(dice=NO_DICE), 
+                    ai_gen_zeropointtwo(dice=NO_DICE),
+                    ai_gen_zeropointthree(dice=NO_DICE), 
+                    ai_gen_zeropointfour(dice=NO_DICE)]
+            
+        for player in self.ais:
+            self.players[player] = NO_DICE
+            self.order.append(player)
         
         self.total_dice = sum(self.players.values())
         
@@ -23,11 +28,15 @@ class AIGame(AITest):
         for player in self.players:
             self.results[player] = 0
 
-    
-    def play(self, rounds):
-        input('Welcome to perudo! ')
 
-        for _ in range(rounds):
+    
+    def play(self, games):
+        input('Welcome to perudo! ')
+        game_num = 0
+
+        for _ in range(games):
+            game_num += 1
+
             for player in self.players:
                 self.order.append(player)
             random.shuffle(self.order)
@@ -71,12 +80,19 @@ class AIGame(AITest):
 
                 self.update_order()
 
+            if game_num % 1000 == 0:
+                print('Game {} complete'.format(game_num))
+
             self.check_winner()
             self.results[self.winner] += 1
 
     def print_results(self):
+        print('')
+        print('Results: ')
+        print('')
         for player in self.results:
             print('{} --- {} wins'.format(str(player), self.results[player]))
+        print('')
 
 
 class AIGame_Round(AITest_Round):
@@ -137,9 +153,12 @@ class AIGame_Round(AITest_Round):
 
 if __name__ == '__main__':
 
-    game = AIGame(5)
+    game = AIGame()
+
 
     game.play(1000)
 
-    game.print_results()
+
+
+
 

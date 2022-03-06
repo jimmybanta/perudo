@@ -3,7 +3,7 @@ import random
 from hand import Hand
 
 class Player:
-    def __init__(self, name, dice=5, ai=False, gen='human'):
+    def __init__(self, name=False, dice=5, ai=False, gen='human'):
         self.name = name
         self.dice = dice
         self.ai = ai
@@ -21,9 +21,8 @@ class Player:
 
 
 class AIPlayer(Player):
-    def __init__(self, name, gen='ai', dice=5):
-        self.name = 'Player {}'.format(name)
-        super().__init__(name=self.name, ai=True, gen=gen, dice=dice)
+    def __init__(self, name=False, gen='ai', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice, ai=True)
     
     
     

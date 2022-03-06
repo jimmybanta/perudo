@@ -3,13 +3,13 @@ import math
 
 from player import AIPlayer
 
-# starting bet is 1 less than average, 50% chance of calling, next bet is one up the line
+# starting bet is 2 less than average, 33% chance of calling, next bet is one up the line
 class ai_gen_zeropointzero(AIPlayer):
     def __init__(self, name, dice=5):
         super().__init__(name, dice=dice, gen='0.0')
 
     def starting_bet(self, average):
-        quantity = math.floor(average - 1) 
+        quantity = math.floor(average - 2) 
         if quantity < 1:
             quantity = 1
         value = random.randint(2,6)
@@ -18,11 +18,10 @@ class ai_gen_zeropointzero(AIPlayer):
     def bet(self, current_bet):
         # any subsequent bet (that isn't the first)
         # return a bet
-        # TODO: incorporate jessies
         quantity = current_bet[0]
         value = current_bet[1]
         d = [2,3,4,5,6,2]
-        if random.random() < .2:
+        if random.random() < .33:
             return False
         else:
             if value == 6:

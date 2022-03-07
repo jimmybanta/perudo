@@ -1,5 +1,6 @@
 import random
 import pdb
+import matplotlib.pyplot as plt
 
 from aitest import AITest, AITest_Round, NO_DICE, AIS
 from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
@@ -36,9 +37,29 @@ class Game_Set:
         print('Results: ')
         print('')
         for player in self.results:
-            print('{} --- {} wins'.format(str(player), self.results[player]))
+            print("{} --- {} wins --- Won {}% of games".format(str(player), 
+                                                self.results[player], 
+                                                round((self.results[player] / self.number) * 100), 2))
         print('')
 
+    def analyze(self):
+        x = []
+        y = []
+        for player in self.results:
+            x.append(player.prob * 100)
+            y.append(round((self.results[player] / self.number), 3) * 100)
+
+        plt.scatter(x,y)
+        plt.xlabel('Percentage Chance of Calling')
+        plt.ylabel('Percentage of Games Won')
+        plt.title('Gen 0 - Starting Bet = 2 Above Average')
+
+        plt.show()
+
+           
+
+
+        
 
 
 
@@ -169,10 +190,11 @@ class AIGame_Round(AITest_Round):
 
 if __name__ == '__main__':
 
-    game_set = Game_Set(1000)
+    game_set = Game_Set(10000)
 
     game_set.run()
 
     game_set.print_results()
 
 
+    game_set.analyze()

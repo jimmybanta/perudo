@@ -3,15 +3,20 @@ import pdb
 
 from game import Game, Round
 from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
+from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
+
 
 NO_DICE = 2
 
-AIS = [ai_gen_zeropointzero(dice=NO_DICE), 
-        ai_gen_zeropointone(dice=NO_DICE), 
+AIS = [ai_gen_zeropointzero(dice=NO_DICE),
+        ai_gen_zeropointone(dice=NO_DICE),
         ai_gen_zeropointtwo(dice=NO_DICE),
-        ai_gen_zeropointthree(dice=NO_DICE), 
-        ai_gen_zeropointfour(dice=NO_DICE), 
-        ai_gen_test(dice=NO_DICE)]
+        ai_gen_zeropointthree(dice=NO_DICE),
+        ai_gen_zeropointfour(dice=NO_DICE),
+        ai_gen_zeropointfive(dice=NO_DICE),
+        ai_gen_zeropointsix(dice=NO_DICE),
+        ai_gen_zeropointseven(dice=NO_DICE),
+        ai_gen_zeropointeight(dice=NO_DICE)]
 
 
 class AITest(Game):

@@ -81,13 +81,13 @@ class Game:
     def update_order(self):
         # run at the end of each round to clear out any players with no more dice
         # add something about keeping track of who loses, for the purposes of data
-        self.order = [player for player in self.order if player.dice > 0]
+        self.order = [player for player in self.order if self.players[player] > 0]
     
     def check_winner(self):
-        # updates self.winner and self.winner_dice 
-        self.winner = self.order[0]
-        self.winner_dice = self.winner.dice
-        
+        # returns the winner 
+        for player in self.players:
+            if self.players[player] != 0:
+                return player
 
 
 

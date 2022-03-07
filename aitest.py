@@ -2,9 +2,17 @@ import random
 import pdb
 
 from game import Game, Round
-from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
+from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
-NO_DICE = 1
+NO_DICE = 2
+
+AIS = [ai_gen_zeropointzero(dice=NO_DICE), 
+        ai_gen_zeropointone(dice=NO_DICE), 
+        ai_gen_zeropointtwo(dice=NO_DICE),
+        ai_gen_zeropointthree(dice=NO_DICE), 
+        ai_gen_zeropointfour(dice=NO_DICE), 
+        ai_gen_test(dice=NO_DICE)]
+
 
 class AITest(Game):
     '''So that I can watch AI's play a game'''
@@ -14,11 +22,7 @@ class AITest(Game):
         self.winner = None
         self.winner_dice = 0
 
-        self.ais = [ai_gen_zeropointzero(dice=NO_DICE), 
-                    ai_gen_zeropointone(dice=NO_DICE), 
-                    ai_gen_zeropointtwo(dice=NO_DICE),
-                    ai_gen_zeropointthree(dice=NO_DICE), 
-                    ai_gen_zeropointfour(dice=NO_DICE)]
+        self.ais = AIS
             
         for player in self.ais:
             self.players[player] = NO_DICE
@@ -110,7 +114,7 @@ class AITest(Game):
 
 
     def print(self, order):
-        return [str(player) for player in order]
+        print([str(player) for player in order])
     
     def print_players(self):
         for item in self.players.items():
@@ -130,7 +134,7 @@ class AITest_Round(Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.bet(first_bet)
+        bet = calling_player.bet(first_bet, self.average)
 
         while bet:
             self.bets.append(bet)
@@ -141,7 +145,7 @@ class AITest_Round(Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.bet(bet)
+            bet = calling_player.bet(bet, self.average)
             
 
         input('Call! ')
@@ -166,7 +170,7 @@ class AITest_Round(Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.straight_bet(first_bet)
+        bet = calling_player.straight_bet(first_bet, self.average)
 
         while bet:
             self.bets.append(bet)
@@ -177,7 +181,7 @@ class AITest_Round(Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.straight_bet(bet)
+            bet = calling_player.straight_bet(bet, self.average)
             
 
         input('Call! ')

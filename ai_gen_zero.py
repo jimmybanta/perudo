@@ -3,6 +3,8 @@ import math
 
 from player import AIPlayer
 
+PROB = 0.01
+
 # starting bet is 2 less than average, 33% chance of calling, next bet is one up the line
 class ai_gen_zeropointzero(AIPlayer):
     def __init__(self, name='Gen 0.0', gen='0.0', dice=5):
@@ -11,14 +13,16 @@ class ai_gen_zeropointzero(AIPlayer):
 
 
     def starting_bet(self, average):
+
         # quantity = math.floor(average - 2)
         # if quantity < 1:
         #    quantity = 1
+
         quantity = 1
         value = random.randint(2,6)
         return (quantity, value)
 
-    def bet(self, current_bet):
+    def bet(self, current_bet, average):
         # any subsequent bet (that isn't the first)
         # return a bet
         quantity = current_bet[0]
@@ -26,18 +30,25 @@ class ai_gen_zeropointzero(AIPlayer):
 
         d = [2,3,4,5,6,2]
 
-        if random.random() < self.prob:
+        if quantity > average * 2:
+            return False
+
+        elif random.random() < self.prob:
             return False
         else:
             if value == 6:
                 quantity += 1
             return (quantity, d[d.index(value) + 1])
     
-    def straight_bet(self, current_bet):
+    def straight_bet(self, current_bet, average):
         quantity = current_bet[0]
         value = current_bet[1]
 
         d = [2,3,4,5,6,2]
+
+
+        if quantity > average:
+            return False
 
         if random.random() < self.prob:
             return False
@@ -58,21 +69,50 @@ class ai_gen_zeropointone(ai_gen_zeropointzero):
     def __init__(self, name='Gen 0.1', gen='0.1', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
         self.prob = .25
+        self.prob = PROB
 
 class ai_gen_zeropointtwo(ai_gen_zeropointzero):
     def __init__(self, name='Gen 0.2', gen='0.2', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
         self.prob = .50
+        self.prob = PROB
 
 class ai_gen_zeropointthree(ai_gen_zeropointzero):
     def __init__(self, name='Gen 0.3', gen='0.3', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
         self.prob = .75
+        self.prob = PROB
 
 class ai_gen_zeropointfour(ai_gen_zeropointzero):
     def __init__(self, name='Gen 0.4', gen='0.4', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
         self.prob = .90
+        self.prob = PROB
+
+
+class ai_gen_test(ai_gen_zeropointzero):
+    def __init__(self, name='test_gen', gen='test', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice)
+        self.prob = 0
+
+
+    def starting_bet(self, average):
+        quantity = int((average * 10) - 1)
+        value = random.randint(2,6)
+        return (quantity, value)
+
+    def bet(self, current_bet, average):
+        # any subsequent bet (that isn't the first)
+        # return a bet
+        quantity = int((average * 10) - 1)
+        value = random.randint(2,6)
+        return (quantity, value)
+    
+    def straight_bet(self, current_bet, average):
+        quantity = int((average * 4) - 1)
+        value = random.randint(2,6)
+        return (quantity, value)
+
 
 
 if __name__ == '__main__':
@@ -84,3 +124,4 @@ if __name__ == '__main__':
     for _ in range(10):
         current_bet = ai.bet(current_bet)
         print(current_bet)
+    

@@ -1,88 +1,35 @@
 import random
+import pdb
 
-from aitest import AITest, AITest_Round, NO_DICE
+from aitest import AITest, AITest_Round, NO_DICE, AIS
 from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
 
-
-class AIGame(AITest):
-    def __init__(self):
-        self.players = {}
-        self.order = []
-        self.winner = None
-        self.winner_dice = 0
-        
-        self.ais = [ai_gen_zeropointzero(dice=NO_DICE), 
-                    ai_gen_zeropointone(dice=NO_DICE), 
-                    ai_gen_zeropointtwo(dice=NO_DICE),
-                    ai_gen_zeropointthree(dice=NO_DICE), 
-                    ai_gen_zeropointfour(dice=NO_DICE)]
-            
-        for player in self.ais:
-            self.players[player] = NO_DICE
-        
-        self.total_dice = sum(self.players.values())
-        
+class Game_Set:
+    def __init__(self, number):
+        self.number = number
         self.results = {}
-        for player in self.players:
-            self.results[player] = 0
 
-
+        for ai in AIS:
+            self.results[ai] = 0
     
-    def play(self, games):
-        input('Welcome to perudo! ')
+
+    def run(self):
+
         game_num = 0
 
-        for _ in range(games):
+        for _ in range(self.number):
             game_num += 1
 
-            for player in self.players:
-                self.order.append(player)
-            random.shuffle(self.order)
-
-            round_num = 0
-            
-            first_player = None
-            straight = False
-
-            while not self.check_end():
-                round_num += 1
-                
-                if not first_player:
-                    order = self.order
-                    direction = 'right'
-                else:
-                    new_order = self.set_order(first_player)
-                    direction = new_order[1]
-                    order = new_order[0]
-                round = AIGame_Round(self.players, order)
-                
-
-                if straight and self.total_dice > 2:
-                    round.straight_run()
-                    straight = False
-                else:
-                    round.run()
-
-                loser = round.final_loser
-                self.end_round(loser)
-
-                if loser.dice == 0:
-                    temp_order = self.set_order(loser, direction=direction)[0]
-                    first_player = temp_order[1]
-                elif loser.dice == 1:
-                    straight = True
-                    first_player = loser
-                else:
-                    first_player = loser
-                
-                self.update_order()
+            game = AIGame()
+            game.play()
+            winner = game.check_winner()
+            self.results[winner] += 1
 
             if game_num % 1000 == 0:
                 print('Game {} complete'.format(game_num))
-
-            self.check_winner()
-            self.results[self.winner] += 1
+                print('')
+            
 
     def print_results(self):
         print('')
@@ -94,6 +41,68 @@ class AIGame(AITest):
 
 
 
+
+
+class AIGame(AITest):
+    def __init__(self):
+        self.players = {}
+        self.order = []
+        
+        self.ais = AIS
+            
+        for player in self.ais:
+            self.players[player] = NO_DICE
+            player.dice = NO_DICE
+            self.order.append(player)
+            
+        random.shuffle(self.order)
+        
+        self.total_dice = sum(self.players.values())
+        
+
+    
+    def play(self):
+        round_num = 0
+        
+        first_player = None
+        straight = False
+
+        while not self.check_end():
+            round_num += 1
+            
+            if not first_player:
+                order = self.order
+                direction = 'right'
+            else:
+                new_order = self.set_order(first_player)
+                direction = new_order[1]
+                order = new_order[0]
+                
+            round = AIGame_Round(self.players, order)
+            
+            
+
+            if straight and self.total_dice > 2:
+                round.straight_run()
+                straight = False
+            else:
+                round.run()
+
+            loser = round.final_loser
+            self.end_round(loser)
+
+            if loser.dice == 0:
+                temp_order = self.set_order(loser, direction=direction)[0]
+                first_player = temp_order[1]
+            elif loser.dice == 1:
+                straight = True
+                first_player = loser
+            else:
+                first_player = loser
+
+            self.update_order()
+            
+    
 
 
 
@@ -110,7 +119,7 @@ class AIGame_Round(AITest_Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.bet(first_bet)
+        bet = calling_player.bet(first_bet, self.average)
         
 
         while bet:
@@ -120,7 +129,7 @@ class AIGame_Round(AITest_Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.bet(bet)
+            bet = calling_player.bet(bet, self.average)
         
             
         bet = self.bets[-1]
@@ -137,7 +146,7 @@ class AIGame_Round(AITest_Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.straight_bet(first_bet)
+        bet = calling_player.straight_bet(first_bet, self.average)
 
         while bet:
             self.bets.append(bet)
@@ -146,7 +155,7 @@ class AIGame_Round(AITest_Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.straight_bet(bet)
+            bet = calling_player.straight_bet(bet, self.average)
             
 
         
@@ -160,12 +169,10 @@ class AIGame_Round(AITest_Round):
 
 if __name__ == '__main__':
 
-    game = AIGame()
+    game_set = Game_Set(1000)
 
+    game_set.run()
 
-    game.play(1000)
-
-    game.print_results()
-
+    game_set.print_results()
 
 

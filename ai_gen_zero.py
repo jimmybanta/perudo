@@ -19,7 +19,7 @@ class ai_gen_zeropointzero(AIPlayer):
         value = random.randint(2,6)
         return (quantity, value)
 
-    def bet(self, current_bet, average):
+    def bet(self, current_bet, average, total_dice=0):
         # any subsequent bet (that isn't the first)
         # return a bet
         quantity = current_bet[0]
@@ -34,7 +34,7 @@ class ai_gen_zeropointzero(AIPlayer):
                 quantity += 1
             return (quantity, d[d.index(value) + 1])
     
-    def straight_bet(self, current_bet, average):
+    def straight_bet(self, current_bet, average, total_dice=0):
         quantity = current_bet[0]
         value = current_bet[1]
 

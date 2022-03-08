@@ -157,9 +157,9 @@ class Math_Generator_Straight(Brute_Generator_Straight):
         
 
     def write_probs(self):
-        fieldnames = ['number_of_dice'] + NAMES
+        fieldnames = ['number_of_dice'] + [i for i in range(1,31)]
 
-        with open('test_probs.csv', 'a') as file:
+        with open('straight_probs.csv', 'a') as file:
             writer = csv.DictWriter(file, fieldnames)
             writer.writeheader()
 
@@ -173,7 +173,7 @@ class Math_Generator_Straight(Brute_Generator_Straight):
 
                 for k in range(1, i + 1):
                     prob = round((att[k] / total), 8)
-                    d[NAMES[k - 1]] = prob
+                    d[k] = prob
 
                 writer.writerow(d)
 
@@ -198,14 +198,15 @@ class Math_Generator_Normal(Brute_Generator_Straight):
             setattr(self, name, temp)
                 
             
-        
+        '''
         for name in NAMES[self.start - 1:self.end]:
             print('{}: {}'.format(name, getattr(self, name)))
+            '''
         
         
 
     def write_probs(self):
-        fieldnames = ['number_of_dice'] + NAMES
+        fieldnames = ['number_of_dice'] + [i for i in range(1,31)]
 
         with open('normal_probs.csv', 'a') as file:
             writer = csv.DictWriter(file, fieldnames)
@@ -221,7 +222,7 @@ class Math_Generator_Normal(Brute_Generator_Straight):
 
                 for k in range(1, i + 1):
                     prob = round((att[k] / total), 8)
-                    d[NAMES[k - 1]] = prob
+                    d[k] = prob
 
                 writer.writerow(d)
 

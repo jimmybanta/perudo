@@ -140,7 +140,7 @@ class AIGame_Round(AITest_Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.bet(first_bet, self.average)
+        bet = calling_player.bet(first_bet, self.total_dice)
         
 
         while bet:
@@ -150,7 +150,7 @@ class AIGame_Round(AITest_Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.bet(bet, self.average)
+            bet = calling_player.bet(bet, self.total_dice)
         
             
         bet = self.bets[-1]
@@ -167,7 +167,7 @@ class AIGame_Round(AITest_Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.straight_bet(first_bet, self.average)
+        bet = calling_player.straight_bet(first_bet, self.total_dice)
 
         while bet:
             self.bets.append(bet)
@@ -176,7 +176,7 @@ class AIGame_Round(AITest_Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.straight_bet(bet, self.average)
+            bet = calling_player.straight_bet(bet, self.total_dice)
             
 
         
@@ -195,6 +195,3 @@ if __name__ == '__main__':
     game_set.run()
 
     game_set.print_results()
-
-
-    game_set.analyze()

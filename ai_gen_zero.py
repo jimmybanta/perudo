@@ -4,7 +4,7 @@ import math
 from player import AIPlayer
 
 
-# starting bet is average, 33% chance of calling, next bet is one up the line
+# starting bet is average - 1, 33% chance of calling, next bet is one up the line
 class ai_gen_zeropointzero(AIPlayer):
     def __init__(self, name='Gen 0.0', gen='0.0', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
@@ -12,7 +12,7 @@ class ai_gen_zeropointzero(AIPlayer):
 
 
     def starting_bet(self, average):
-        quantity = math.floor(average)
+        quantity = math.floor(average - 1)
         if quantity < 1:
            quantity = 1
 

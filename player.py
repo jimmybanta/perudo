@@ -12,7 +12,6 @@ class Player:
         self.dice = dice
         self.ai = ai
         self.gen = gen
-        self.one_left = True if self.dice == 1 else False
     
     def roll(self):
         self.hand = Hand(size=self.dice)
@@ -20,13 +19,24 @@ class Player:
     def lose_turn(self):
         self.dice -= 1
     
+    @property
+    def one_left(self):
+        return True if self.dice == 1 else False
+    
     def __str__(self):
         return self.name
+
     
 
+class AIPlayer(Player):
+    def __init__(self, name=False, gen='ai', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice, ai=True)
+    
     def retrieve_probability(self, quantity, total_dice, jessies=False, straight=False):
-        '''Retrieves probability that ther are [quantity] dice among 
-        [total_dice] dice, using normal_probs unless value = 1 or it's straight'''
+        '''Retrieves probability that there are [quantity] dice among [total_dice] dice.
+        
+        Uses normal_probs unless value = 1 or it's straight - in which case it uses straight_probs'''
+
         if jessies or straight:
             with open('probs/straight_probs.csv', 'r') as file:
                 reader = csv.DictReader(file)
@@ -43,25 +53,12 @@ class Player:
                     if row['number_of_dice'] != str(total_dice):
                         continue
                     return round(float(row[str(quantity)]), 4)
-        
-    
-    
-
-
-
-class AIPlayer(Player):
-    def __init__(self, name=False, gen='ai', dice=5):
-        super().__init__(name=name, gen=gen, dice=dice, ai=True)
     
     
     
     
 if __name__ == '__main__':
     player = Player()
-
-    prob = player.retrieve_probability(1,3)
-
-    print(prob)
 
     
 

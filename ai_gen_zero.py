@@ -22,8 +22,7 @@ class ai_gen_zeropointzero(AIPlayer):
     def bet(self, current_bet, average, total_dice=0):
         # any subsequent bet (that isn't the first)
         # return a bet
-        quantity = current_bet[0]
-        value = current_bet[1]
+        quantity, value = current_bet
 
         d = [2,3,4,5,6,2]
 
@@ -35,8 +34,7 @@ class ai_gen_zeropointzero(AIPlayer):
             return (quantity, d[d.index(value) + 1])
     
     def straight_bet(self, current_bet, average, total_dice=0):
-        quantity = current_bet[0]
-        value = current_bet[1]
+        quantity, value = current_bet
 
         d = [2,3,4,5,6,2]
 
@@ -127,7 +125,7 @@ if __name__ == '__main__':
     current_bet = ai.starting_bet(8)
     print(current_bet)
 
-    for _ in range(10):
-        current_bet = ai.bet(current_bet)
-        print(current_bet)
+    
+    new_bet = ai.bet(current_bet, 9)
+    print(new_bet)
     

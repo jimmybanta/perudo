@@ -6,7 +6,7 @@ from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, 
 from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
 from ai_gen_one import ai_gen_onepointzero
 
-NO_DICE = 2
+NO_DICE = 5
 
 AIS = [ai_gen_zeropointzero(dice=NO_DICE),
         ai_gen_zeropointone(dice=NO_DICE),
@@ -60,9 +60,7 @@ class AITest(Game):
                 order = self.order
                 direction = 'right'
             else:
-                new_order = self.set_order(first_player)
-                direction = new_order[1]
-                order = new_order[0]
+                order, direction = self.set_order(first_player)
             round = AITest_Round(self.players, order)
             
             print('')

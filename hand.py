@@ -9,7 +9,7 @@ class Hand(list):
                 raise ValueError('Need to pass in {} values!'.format(size))
             else:
                 for arg in args:
-                    self.append(D6(arg))
+                    self.append(D6(value=arg))
         else:
             for _ in range(size):
                 self.append(D6())

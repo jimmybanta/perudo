@@ -3,6 +3,7 @@ import itertools as it
 import csv
 
 from hand import Hand
+from dice import D6
 
 DICE = [1,2,3,4,5,6]
 
@@ -13,8 +14,11 @@ class Player:
         self.ai = ai
         self.gen = gen
     
-    def roll(self):
-        self.hand = Hand(size=self.dice)
+    def roll(self, *args):
+        if args:
+            self.hand = Hand(*args, size=self.dice)
+        else:
+            self.hand = Hand(size=self.dice)
     
     def lose_turn(self):
         self.dice -= 1

@@ -4,15 +4,15 @@ import pdb
 from game import Game, Round
 from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
-from ai_gen_one import ai_gen_onepointzero
+from ai_gen_one import ai_gen_onepointzero, ai_gen_onepointone
 
 NO_DICE = 5
 
 AIS = [ai_gen_zeropointzero(dice=NO_DICE),
-        ai_gen_zeropointone(dice=NO_DICE),
         ai_gen_zeropointfive(dice=NO_DICE),
         ai_gen_zeropointsix(dice=NO_DICE),
-        ai_gen_onepointzero(dice=NO_DICE)]
+        ai_gen_onepointzero(dice=NO_DICE), 
+        ai_gen_onepointone(dice=NO_DICE)]
 
 
 class AITest(Game):
@@ -144,8 +144,6 @@ class AITest_Round(Round):
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            if calling_player.gen == '1.0':
-                print('PLAYER 1.0 HAND: {}'.format(calling_player.hand))
             bet = calling_player.bet(bet, self.total_dice)
             
 

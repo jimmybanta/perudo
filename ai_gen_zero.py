@@ -31,12 +31,14 @@ class ai_gen_zeropointzero(AIPlayer):
         else:
             if value == 6:
                 quantity += 1
+            if value == 1:
+                return (quantity + 1, value)
             return (quantity, d[d.index(value) + 1])
     
     def straight_bet(self, current_bet, average, total_dice=0):
         quantity, value = current_bet
 
-        d = [2,3,4,5,6,2]
+        d = [1,2,3,4,5,6,1]
 
         if random.random() < self.prob:
             return False

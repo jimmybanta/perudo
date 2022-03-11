@@ -27,7 +27,7 @@ class Game_Set:
             winner = game.check_winner()
             self.results[winner] += 1
 
-            if game_num % 1000 == 0:
+            if game_num % 100 == 0:
                 print('Game {} complete'.format(game_num))
                 print('')
             
@@ -190,7 +190,7 @@ class AIGame_Round(AITest_Round):
 
 if __name__ == '__main__':
 
-    game_set = Game_Set(10000)
+    game_set = Game_Set(1000)
 
     game_set.run()
 

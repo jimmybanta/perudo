@@ -4,87 +4,83 @@ import pdb
 from game import Game, Round
 from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
-from ai_gen_one import ai_gen_onepointzero, ai_gen_onepointone
+from ai_gen_one import ai_gen_onepointzero, ai_gen_onepointone, ai_gen_onepointtwo
 
-NO_DICE = 3
+NO_DICE = 5
 
-AIS = [ai_gen_onepointone(dice=NO_DICE),
+AIS = [ai_gen_onepointtwo(dice=NO_DICE),
+        ai_gen_onepointone(dice=NO_DICE),
         ai_gen_onepointzero(dice=NO_DICE),
-        ai_gen_onepointone(dice=NO_DICE),
-        ai_gen_onepointzero(dice=NO_DICE), 
-        ai_gen_onepointone(dice=NO_DICE),
-        ai_gen_onepointzero(dice=NO_DICE)]
+        ai_gen_zeropointsix(dice=NO_DICE), 
+        ai_gen_zeropointfive(dice=NO_DICE),
+        ai_gen_zeropointzero(dice=NO_DICE)]
 
 
 
 class AITest(Game):
     '''So that I can watch AI's play a game'''
     def __init__(self):
-        self.players = {}
-        self.order = []
-        self.winner = None
-        self.winner_dice = 0
-
-        self.ais = AIS
+        super().__init__()
             
-        for player in self.ais:
+        for player in AIS:
             self.players[player] = NO_DICE
             self.order.append(player)
+            player.dice = NO_DICE
         
         random.shuffle(self.order)
-
-        self.temp_order = self.order.copy()
         
         self.total_dice = sum(self.players.values())
 
+        self.test = True
+
+
     
     def play(self):
-        input('Welcome to perudo! ')
         round_num = 0
-        print('Global order: {}'.format(self.print(self.order)))
-        print('')
+
+        if self.test:
+            input('Welcome to perudo! ')
+            print('Global order: {}'.format(self.print(self.order)))
+            print('')
 
         first_player = None
         straight = False
 
-        print('')
-
         while not self.check_end():
             round_num += 1
-            input('Start of Round {}... '.format(round_num))
-            if straight:
-                print('STRAIGHT ROUND')
-            print('')
-            self.print_players()
-            print('')
+            if self.test:
+                input('Start of Round {}... '.format(round_num))
+                if straight:
+                    print('STRAIGHT ROUND')
+                print('')
+                self.print_players()
+                print('')
             
             if not first_player:
                 order = self.order
                 direction = 'right'
             else:
                 order, direction = self.set_order(first_player)
-            round = AIRound(self.players, order)
+            round = AIRound(self.players, order, test=self.test, straight=straight)
             
-            print('')
-            print('Round order: {}'.format(self.print(order)))
-            print('')
+            if self.test:
+                print('')
+                print('Round order: {}'.format(self.print(order)))
+                print('')
             
-            print('Dice: {}'.format(round.all_dice))
+                print('Dice: {}'.format(round.all_dice))
 
-            if straight and self.total_dice > 2:
-                round.run(straight=True, test=True)
-                straight = False
-            else:
-                round.run(test=True)
+            round.run()
 
             loser = round.final_loser
-            print('Loser: {}'.format(loser))
+            if self.test:
+                print('Loser: {}'.format(loser))
             self.end_round(loser)
 
             if loser.dice == 0:
                 temp_order = self.set_order(loser, direction=direction)[0]
                 first_player = temp_order[1]
-            elif loser.dice == 1:
+            elif loser.dice == 1 and self.total_dice > 2:
                 straight = True
                 first_player = loser
             else:
@@ -92,18 +88,20 @@ class AITest(Game):
             
 
             self.update_order()
-            print('')
 
-        print('Game Over!')
-        winner = self.check_winner()
-        print('Winner: {} with {} dice'.format(winner, self.winner_dice))
+        if self.test:
+            winner = self.check_winner()
+            print('Game Over!')
+            print('Winner: {} with {} dice'.format(winner, self.winner_dice))
     
     def set_order(self, player, direction=False):
         # sets the order for a round, given the first player
         round_order = []
         if not direction:
             direction = player.choose_direction()
+
         start = self.order.index(player)
+    
         length = len(self.order)
         if direction == 'right':
             round_order = self.order[start:] + self.order[:start]
@@ -113,25 +111,32 @@ class AITest(Game):
             round_order = temp[length - (start + 1):] + temp[:length - (start + 1)]
         return round_order, direction
 
-
     def print(self, order):
         print([str(player) for player in order])
     
     def print_players(self):
-        for item in self.players.items():
-            print('{} -- {} dice'.format(str(item[0]), item[1]))
+        for player in self.players:
+            print('{} -- {} dice'.format(str(player), player.dice))
+
+        #for item in self.players.items():
+         #   print('{} -- {} dice'.format(str(item[0]), item[1]))
 
 
 
 class AIRound(Round):
+    def __init__(self, players, order, test=False, straight=False):
+        super().__init__(players, order)
+        self.test = test
+        self.straight = straight
 
-    def run(self, straight=False, test=False):
+    def run(self):
 
         betting_player = self.order[0]
-        first_bet = self.start()
+        first_bet = self.start(straight=self.straight)
 
-        if test:
+        if self.test:
             print("First bet: {} {}'s".format(first_bet[0], first_bet[1]))
+            print('Hand: {}'.format(betting_player.hand))
             print('by {}'.format(str(betting_player)))
             input('')
         self.bets.append(first_bet)
@@ -139,32 +144,35 @@ class AIRound(Round):
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.bet(first_bet, self.total_dice, straight=straight)
+        bet = calling_player.bet(first_bet, self.total_dice, straight=self.straight)
 
         while bet:
             self.bets.append(bet)
             betting_player = calling_player
-            if test:
+            if self.test:
                 print("Current bet: {} {}'s".format(bet[0], bet[1]))
+                print('Hand: {}'.format(betting_player.hand))
                 print('by {}'.format(str(betting_player)))
                 input('')
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.bet(bet, self.total_dice, straight=straight)
+            bet = calling_player.bet(bet, self.total_dice, straight=self.straight)
             
         
         bet = self.bets[-1]
 
-        if test:
+        if self.test:
             input('Call! ')
+            print('Hand: {}'.format(betting_player.hand))
+
             print('')
             print('Betting player: {}'.format(str(betting_player)))
             print('Calling player: {}'.format(str(calling_player)))
             print('')
-            print('Bet is {}'.format(self.score(bet, straight=straight)))
+            print('Bet is {}'.format(self.score(bet, straight=self.straight)))
 
-        self.final_loser = self.loser(bet, calling_player, betting_player)
+        self.final_loser = self.loser(bet, calling_player, betting_player, straight=self.straight)
     
 
 

@@ -22,18 +22,6 @@ class ai_gen_onepointzero(ai_gen_zeropointzero):
         else:
             return self.up_the_line(current_bet, total_dice, straight=straight, jessies=jessies)
 
-    def starting_bet(self, average):
-        quantity = math.floor(average - 1)
-        if quantity < 1:
-           quantity = 1
-
-        value = random.randint(2,6)
-        return (quantity, value)
-
-    def choose_direction(self):
-        # True = right, False = left
-        return 'right' if random.random() < .5 else 'left'
-
 
 
 class ai_gen_onepointone(ai_gen_onepointzero):
@@ -42,47 +30,35 @@ class ai_gen_onepointone(ai_gen_onepointzero):
     def __init__(self, name='Gen 1.1', gen='1.1', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
     
-    def possible_bets(self, bet, look_ahead, straight=False, jessies=False):
+    def possible_bets(self, bet, straight=False, jessies=False):
         '''Given a current_bet, returns all possible bets under a max quantity'''
-        look_ahead += 1
         quantity, value = bet
 
         straight_bets = []
         normal_bets = []
 
         if straight:
-            max = quantity + look_ahead 
             if self.one_left:
                 for i in range(value + 1, 7):
                     straight_bets.append((quantity, i))
-                for j in range(quantity + 1, max):
-                    for k in range(1,7):
-                        straight_bets.append((j,k))
+                for j in range(1, value + 1):
+                    straight_bets.append((quantity + 1, j))
             else:
-                for j in range(quantity + 1, max):
-                    straight_bets.append((j, value))
+                straight_bets.append((quantity + 1, value))
         else:
             if jessies:
-                max1 = quantity + look_ahead 
-                maxnormal = (quantity * 2) + 1 + look_ahead 
+                straight_bets.append((quantity + 1, 1))
 
-                for i in range(quantity + 1, max1):
-                    straight_bets.append((i, 1))
-                for j in range((quantity * 2) + 1, maxnormal):
-                    for k in range(2,7):
-                        normal_bets.append((j,k))
+                for k in range(2,7):
+                    normal_bets.append(((quantity * 2) + 1,k))
             else:
-                max = quantity // 2 + look_ahead
-                for l in range(math.ceil((quantity / 2)), max):
-                    straight_bets.append((l, 1))
+                straight_bets.append((math.ceil(quantity / 2), 1))
                 
-
-                max = quantity + look_ahead 
                 for i in range(value + 1, 7):
                     normal_bets.append((quantity, i))
-                for j in range(quantity + 1, max):
-                    for k in range(2,7):
-                        normal_bets.append((j,k))
+
+                for j in range(2, value + 1):
+                    normal_bets.append((quantity + 1, j))
                 
         return straight_bets, normal_bets
 
@@ -97,8 +73,7 @@ class ai_gen_onepointone(ai_gen_onepointzero):
         if self.prob(current_bet, total_dice, straight=straight, jessies=jessies)  < .5:
             return False
 
-
-        straight_bets, normal_bets = self.possible_bets(current_bet, 5, straight=straight, jessies=jessies)
+        straight_bets, normal_bets = self.possible_bets(current_bet, straight=straight, jessies=jessies)
 
         straight_probs = [self.prob(bet, total_dice, straight=True) for bet in straight_bets]
         normal_probs = [self.prob(bet, total_dice) for bet in normal_bets]
@@ -111,16 +86,68 @@ class ai_gen_onepointone(ai_gen_onepointzero):
 
         return random.choice([x[0] for x in final])
 
+
+
+class ai_gen_onepointtwo(ai_gen_onepointzero):
+    def __init__(self, name='Gen 1.2', gen='1.2', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice)
     
+
+
+    def starting_bet(self, total_dice, straight=False):
+    
+        bets = self.possible_starting_bets(total_dice, straight=straight)
+
+        probs = [self.prob(bet, total_dice, straight=straight) for bet in bets]
+
+        final = list(zip(bets, probs))
+        final = [x for x in final if x[1] >= .66]
+
+        final.sort(key=lambda x:x[0], reverse=True)
+
+        while not final:
+            total_dice -= 1
+            return self.starting_bet(total_dice, straight=straight)
+
+        return final[0][0]
+    
+
+
+
+    def possible_starting_bets(self, total_dice, straight=False):
+        bets = []
+
+        if straight:
+            average = total_dice // 6
+            for i in range(average - 1, average + 2):
+                for j in range(1,7):
+                    bets.append((i, j))
+        else:
+            average = total_dice // 3
+            for i in range(average - 1, average + 2):
+                for j in range(2,7):
+                    bets.append((i, j))
+        
+        
+        return bets
+
+
+
+
+
+        
+
+    
+
 
 
 if __name__ == "__main__":
-    player = ai_gen_onepointone()
-    player.roll()
-    print(player.hand)
-    
 
-    print(player.bet((3,4), 10))
+    player = ai_gen_onepointtwo()
+    player.roll()
+    
+    print(player.starting_bet(18))
+    
 
 
     

@@ -7,6 +7,7 @@ from dice import D6
 
 DICE = [1,2,3,4,5,6]
 
+
 class Player:
     def __init__(self, name=False, dice=5, ai=False, gen='human'):
         self.name = name
@@ -23,18 +24,20 @@ class Player:
     def lose_turn(self):
         self.dice -= 1
     
+    def __str__(self):
+        return self.name
+
     @property
     def one_left(self):
         return True if self.dice == 1 else False
     
-    def __str__(self):
-        return self.name
+    
 
     
 
 class AIPlayer(Player):
     '''Comes with a prob method that, passed a bet and the total dice, returns the prob of that bet.'''
-    def __init__(self, name=False, gen='ai', dice=5):
+    def __init__(self, name=False, dice=5, gen=False):
         super().__init__(name=name, gen=gen, dice=dice, ai=True)
 
 
@@ -83,6 +86,7 @@ class AIPlayer(Player):
                     if row['number_of_dice'] != str(unknown_dice):
                         continue
                     return round(float(row[str(total_needed)]), 4)
+    
     
     def prob(self, bet, total_dice, straight=False, jessies=False):
         '''Given a bet, determines the probability of it GIVEN THE CURRENT HAND'''

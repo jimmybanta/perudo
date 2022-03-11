@@ -10,8 +10,9 @@ class ai_gen_zeropointzero(AIPlayer):
         super().__init__(name=name, gen=gen, dice=dice)
         self.probability = .33
 
-    def starting_bet(self, average):
-        quantity = math.floor(average - 1)
+    def starting_bet(self, total_dice, straight=False):
+        average = total_dice / 3
+        quantity = math.floor(average - 2)
         if quantity < 1:
            quantity = 1
 
@@ -128,10 +129,4 @@ class ai_gen_test(ai_gen_zeropointzero):
 if __name__ == '__main__':
     ai = ai_gen_zeropointzero('joe')
 
-    current_bet = ai.starting_bet(8)
-    print(current_bet)
-
-    
-    new_bet = ai.bet(current_bet, 9)
-    print(new_bet)
     

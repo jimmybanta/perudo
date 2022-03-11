@@ -6,44 +6,15 @@ from ai_gen_zero import ai_gen_zeropointzero
 
 from player import Player, AIPlayer
 
-NO_DICE = 2
+NO_DICE = 5
 
 class Game:
-    def __init__(self, num_players):
+    def __init__(self):
         self.players = {}
         self.order = []
         self.winner = None
         self.winner_dice = 0
         
-    
-    def play(self):
-        input('Welcome to perudo! You know the rules...')
-        round_num = 0
-
-        while not self.check_end():
-            round_num += 1
-            input('start of round... ')
-
-            for player in self.players:
-                print('Player: {}'.format(str(player)))
-                print('Dice: {}'.format(self.players[player]))
-            print('')
-            print('order: {}'.format([str(player) for player in self.order]))
-            print('')
-            if round_num == 1:
-                round = Round(self.players, self.order)
-            print('Dice: {}'.format(round.all_dice))
-            round.run()
-            print('Loser: {}'.format(round.final_loser))
-            self.end_round(round.final_loser)
-            self.update_order()
-            print('')
-        print('Game Over!')
-        self.check_winner()
-        print('Winner: {} with {} dice'.format(self.winner, self.winner_dice))
-        
-        
-
         
     def end_round(self, player):
         self.players[player] -= 1
@@ -81,22 +52,32 @@ class HumanGame(Game):
 
         self.total_dice = sum(self.players.values())
 
+    def play(self):
+        input('Welcome to perudo! You know the rules...')
+        round_num = 0
 
+        while not self.check_end():
+            round_num += 1
+            input('start of round... ')
 
+            for player in self.players:
+                print('Player: {}'.format(str(player)))
+                print('Dice: {}'.format(self.players[player]))
+            print('')
+            print('order: {}'.format([str(player) for player in self.order]))
+            print('')
+            if round_num == 1:
+                round = Round(self.players, self.order)
+            print('Dice: {}'.format(round.all_dice))
+            round.run()
+            print('Loser: {}'.format(round.final_loser))
+            self.end_round(round.final_loser)
+            self.update_order()
+            print('')
+        print('Game Over!')
+        self.check_winner()
+        print('Winner: {} with {} dice'.format(self.winner, self.winner_dice))
 
-class AIGame(Game):
-    def __init__(self, num_players):
-        super().__init__(num_players)
-
-        for i in range(num_players):
-            ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
-            self.players[ai_player] = NO_DICE
-            self.order.append(ai_player)
-
-                    
-        random.shuffle(self.order)
-
-        self.total_dice = sum(self.players.values())
 
 
 
@@ -111,29 +92,25 @@ class Round:
             player.roll()
 
         self.total_dice = sum(self.players.values())
+
         self.all_dice = []
         for player in self.order:
             for die in player.hand:
                 self.all_dice.append(die.value)
-        self.all_dice.sort()
 
-        self.average = self.total_dice / 3
+        self.all_dice.sort()
 
         self.final_loser = None
 
         # keep track of bets - to be used later
         self.bets = []
 
+
     def start(self, straight=False):
         first = self.order[0]
-        if straight:
-            if first.ai:
-                return first.starting_bet(self.average / 2)
-            else:
-                return self.input_start()
 
         if first.ai:
-            return first.starting_bet(self.average)
+            return first.starting_bet(self.total_dice, straight=straight)
         else:
             return self.input_start()
     
@@ -266,7 +243,6 @@ class Round:
 
         print('Legal!') if truth else print('ILLEGAL')
         print('')
-
 
     def loser(self, bet, calling_player, betting_player, straight=False):
         return calling_player if self.score(bet, straight=straight) else betting_player

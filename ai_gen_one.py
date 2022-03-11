@@ -88,11 +88,10 @@ class ai_gen_onepointone(ai_gen_onepointzero):
 
 
 
-class ai_gen_onepointtwo(ai_gen_onepointzero):
+class ai_gen_onepointtwo(ai_gen_onepointone):
     def __init__(self, name='Gen 1.2', gen='1.2', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
     
-
 
     def starting_bet(self, total_dice, straight=False):
     
@@ -112,8 +111,6 @@ class ai_gen_onepointtwo(ai_gen_onepointzero):
         return final[0][0]
     
 
-
-
     def possible_starting_bets(self, total_dice, straight=False):
         bets = []
 
@@ -128,9 +125,40 @@ class ai_gen_onepointtwo(ai_gen_onepointzero):
                 for j in range(2,7):
                     bets.append((i, j))
         
-        
         return bets
 
+
+class ai_gen_onepointthree(ai_gen_onepointtwo):
+    def __init__(self, name='Gen 1.3', gen='1.3', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice)
+    
+    def bet(self, current_bet, total_dice, straight=False):
+        '''Returns False if it decides to call, otherwise returns a bet.
+        
+            Makes a bet by choosing the highest-probability possible bet.'''
+
+        value = current_bet[1]
+        jessies = True if value == 1 else False
+
+        first_prob = self.prob(current_bet, total_dice, straight=straight, jessies=jessies)
+
+        first_prob = 1 - first_prob
+        # first_prob is now the probability that you would be correct in calling
+
+        straight_bets, normal_bets = self.possible_bets(current_bet, straight=straight, jessies=jessies)
+
+        straight_probs = [self.prob(bet, total_dice, straight=True) for bet in straight_bets]
+        normal_probs = [self.prob(bet, total_dice) for bet in normal_bets]
+
+        final = list(zip(straight_bets, straight_probs)) + list(zip(normal_bets, normal_probs))
+
+        second_prob = max([x[1] for x in final])
+
+        if first_prob >= second_prob:
+            return False
+        else:
+            final = [x for x in final if x[1] == second_prob]
+            return random.choice([x[0] for x in final])
 
 
 
@@ -143,10 +171,10 @@ class ai_gen_onepointtwo(ai_gen_onepointzero):
 
 if __name__ == "__main__":
 
-    player = ai_gen_onepointtwo()
+    player = ai_gen_onepointthree()
     player.roll()
     
-    print(player.starting_bet(18))
+    print(player.bet((4,3), 15))
     
 
 

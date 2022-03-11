@@ -1,12 +1,13 @@
 import random
 import pdb
 import matplotlib.pyplot as plt
+from numpy import true_divide
 
-from aitest import AITest, AITest_Round, NO_DICE, AIS
+from aitest import AITest, AIRound, NO_DICE, AIS
 from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
 
-class Game_Set:
+class GameSet:
     def __init__(self, number):
         self.number = number
         self.results = {}
@@ -99,12 +100,12 @@ class AIGame(AITest):
                 direction = new_order[1]
                 order = new_order[0]
                 
-            round = AIGame_Round(self.players, order)
+            round = AIRound(self.players, order)
             
             
 
             if straight and self.total_dice > 2:
-                round.straight_run()
+                round.run(straight=True)
                 straight = False
             else:
                 round.run()
@@ -130,8 +131,9 @@ class AIGame(AITest):
 
 
 
-class AIGame_Round(AITest_Round):
-    def run(self):
+class AIGame_Round(AIRound):
+
+    def run(self, straight=False):
         betting_player = self.order[0]
         first_bet = self.start()
         
@@ -190,7 +192,7 @@ class AIGame_Round(AITest_Round):
 
 if __name__ == '__main__':
 
-    game_set = Game_Set(1000)
+    game_set = GameSet(500)
 
     game_set.run()
 

@@ -6,13 +6,15 @@ from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, 
 from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
 from ai_gen_one import ai_gen_onepointzero, ai_gen_onepointone
 
-NO_DICE = 5
+NO_DICE = 3
 
-AIS = [ai_gen_zeropointzero(dice=NO_DICE),
-        ai_gen_zeropointfive(dice=NO_DICE),
-        ai_gen_zeropointsix(dice=NO_DICE),
+AIS = [ai_gen_onepointone(dice=NO_DICE),
+        ai_gen_onepointzero(dice=NO_DICE),
+        ai_gen_onepointone(dice=NO_DICE),
         ai_gen_onepointzero(dice=NO_DICE), 
-        ai_gen_onepointone(dice=NO_DICE)]
+        ai_gen_onepointone(dice=NO_DICE),
+        ai_gen_onepointzero(dice=NO_DICE)]
+
 
 
 class AITest(Game):
@@ -61,7 +63,7 @@ class AITest(Game):
                 direction = 'right'
             else:
                 order, direction = self.set_order(first_player)
-            round = AITest_Round(self.players, order)
+            round = AIRound(self.players, order)
             
             print('')
             print('Round order: {}'.format(self.print(order)))
@@ -70,10 +72,10 @@ class AITest(Game):
             print('Dice: {}'.format(round.all_dice))
 
             if straight and self.total_dice > 2:
-                round.straight_run()
+                round.run(straight=True, test=True)
                 straight = False
             else:
-                round.run()
+                round.run(test=True)
 
             loser = round.final_loser
             print('Loser: {}'.format(loser))
@@ -121,77 +123,49 @@ class AITest(Game):
 
 
 
-class AITest_Round(Round):
-    def run(self):
+class AIRound(Round):
+
+    def run(self, straight=False, test=False):
+
         betting_player = self.order[0]
         first_bet = self.start()
-        print("First bet: {} {}'s".format(first_bet[0], first_bet[1]))
-        print('by {}'.format(str(betting_player)))
-        input('')
+
+        if test:
+            print("First bet: {} {}'s".format(first_bet[0], first_bet[1]))
+            print('by {}'.format(str(betting_player)))
+            input('')
         self.bets.append(first_bet)
 
         turn = 1
 
         calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.bet(first_bet, self.total_dice)
+        bet = calling_player.bet(first_bet, self.total_dice, straight=straight)
 
         while bet:
             self.bets.append(bet)
             betting_player = calling_player
-            print("Current bet: {} {}'s".format(bet[0], bet[1]))
-            print('by {}'.format(str(betting_player)))
-            input('')
+            if test:
+                print("Current bet: {} {}'s".format(bet[0], bet[1]))
+                print('by {}'.format(str(betting_player)))
+                input('')
             turn += 1
 
             calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.bet(bet, self.total_dice)
+            bet = calling_player.bet(bet, self.total_dice, straight=straight)
             
-
-        input('Call! ')
-        print('')
+        
         bet = self.bets[-1]
-        print('Betting player: {}'.format(str(betting_player)))
-        print('Calling player: {}'.format(str(calling_player)))
-        print('')
-        print('Bet is {}'.format(self.score(bet)))
+
+        if test:
+            input('Call! ')
+            print('')
+            print('Betting player: {}'.format(str(betting_player)))
+            print('Calling player: {}'.format(str(calling_player)))
+            print('')
+            print('Bet is {}'.format(self.score(bet, straight=straight)))
 
         self.final_loser = self.loser(bet, calling_player, betting_player)
     
-
-    def straight_run(self):
-        betting_player = self.order[0]
-        first_bet = self.start(straight=True)
-        print("First bet: {} {}'s".format(first_bet[0], first_bet[1]))
-        print('by {}'.format(str(betting_player)))
-        input('')
-        self.bets.append(first_bet)
-
-        turn = 1
-
-        calling_player = self.order[turn % len(self.order)]
-        bet = calling_player.straight_bet(first_bet, self.total_dice)
-
-        while bet:
-            self.bets.append(bet)
-            betting_player = calling_player
-            print("Current bet: {} {}'s".format(bet[0], bet[1]))
-            print('by {}'.format(str(betting_player)))
-            input('')
-            turn += 1
-
-            calling_player = self.order[turn % len(self.order)]
-            bet = calling_player.straight_bet(bet, self.total_dice)
-            
-
-        input('Call! ')
-        print('')
-        bet = self.bets[-1]
-        print('Betting player: {}'.format(str(betting_player)))
-        print('Calling player: {}'.format(str(calling_player)))
-        print('')
-        print('Bet is {}'.format(self.straight_score(bet)))
-
-        self.final_loser = self.loser(bet, calling_player, betting_player)
 
 
 

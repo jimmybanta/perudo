@@ -9,36 +9,12 @@ from player import Player, AIPlayer
 NO_DICE = 2
 
 class Game:
-
-    def __init__(self, num_players, human=False):
+    def __init__(self, num_players):
         self.players = {}
         self.order = []
         self.winner = None
         self.winner_dice = 0
         
-        if human:
-            for i in range(num_players - 1):
-                ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
-                self.players[ai_player] = NO_DICE
-                self.order.append(ai_player)
-            name = input('What is your name? ')
-            human_player = Player(name, dice=NO_DICE)
-            self.players[human_player] = NO_DICE
-            self.order.append(human_player)
-            
-            
-        else:
-            for i in range(num_players):
-                ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
-                self.players[ai_player] = NO_DICE
-                self.order.append(ai_player)
-        
-        random.shuffle(self.order)
-
-        self.temp_order = self.order.copy()
-        
-        self.total_dice = sum(self.players.values())
-
     
     def play(self):
         input('Welcome to perudo! You know the rules...')
@@ -73,14 +49,11 @@ class Game:
         self.players[player] -= 1
         player.dice -= 1
 
-
     def check_end(self):
         players = [x for x in self.players if self.players[x] != 0]
         return False if len(players) >= 2 else True
         
     def update_order(self):
-        # run at the end of each round to clear out any players with no more dice
-        # add something about keeping track of who loses, for the purposes of data
         self.order = [player for player in self.order if self.players[player] > 0]
     
     def check_winner(self):
@@ -88,6 +61,44 @@ class Game:
         for player in self.players:
             if self.players[player] != 0:
                 return player
+
+
+
+class HumanGame(Game):
+    def __init__(self, num_players):
+        super().__init__(num_players)
+
+        for i in range(num_players - 1):
+            ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
+            self.players[ai_player] = NO_DICE
+            self.order.append(ai_player)
+            name = input('What is your name? ')
+            human_player = Player(name, dice=NO_DICE)
+            self.players[human_player] = NO_DICE
+            self.order.append(human_player)
+
+        random.shuffle(self.order)
+
+        self.total_dice = sum(self.players.values())
+
+
+
+
+class AIGame(Game):
+    def __init__(self, num_players):
+        super().__init__(num_players)
+
+        for i in range(num_players):
+            ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
+            self.players[ai_player] = NO_DICE
+            self.order.append(ai_player)
+
+                    
+        random.shuffle(self.order)
+
+        self.total_dice = sum(self.players.values())
+
+
 
 
 
@@ -187,21 +198,19 @@ class Round:
         
         print('Loser: {}'.format(self.final_loser))
 
-    def score(self, bet):
+
+    def score(self, bet, straight=False):
         # returns if a bet is true
         quantity, value = bet[0], bet[1]
 
         ones = self.all_dice.count(1)
         others = self.all_dice.count(value)
-        
-        return True if ones + others >= quantity else False
-    
-    def straight_score(self, bet):
-        quantity, value = bet[0], bet[1]
 
-        others = self.all_dice.count(value)
-        
-        return True if others >= quantity else False
+        if straight:
+            return True if others >= quantity else False
+        else:
+            return True if ones + others >= quantity else False
+    
     
     def legal_move(self, current, next):
         # returns whether a move is legal or not
@@ -259,8 +268,8 @@ class Round:
         print('')
 
 
-    def loser(self, bet, calling_player, betting_player):
-        return calling_player if self.score(bet) else betting_player
+    def loser(self, bet, calling_player, betting_player, straight=False):
+        return calling_player if self.score(bet, straight=straight) else betting_player
         
 
 

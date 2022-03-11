@@ -4,79 +4,23 @@ import random
 from ai_gen_zero import ai_gen_zeropointzero
 from player import AIPlayer
 
-class ai_gen_onepointzero(AIPlayer):
+class ai_gen_onepointzero(ai_gen_zeropointzero):
     '''Uses probabilities to call. Doesn't use it to make any bets.'''
     def __init__(self, name='Gen 1.0', gen='1.0', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
 
 
-    def bet(self, current_bet, total_dice):
+    def bet(self, current_bet, total_dice, straight=False):
         '''If prob of bet is less than 50%, it calls. Otherwise it sends it up the line'''
         hand = self.hand
 
-        quantity = current_bet[0]
-        value = current_bet[1]
-
-        total_needed = quantity
-        unknown_dice = total_dice - len(hand)
-
-        for die in hand:
-            if die.value == value or die.value == 1:
-                total_needed -= 1
-        
-        
-        if total_needed > 0 and total_needed <= unknown_dice:
-            prob = self.retrieve_probability(total_needed, unknown_dice)
-        elif total_needed > unknown_dice:
-            prob = 0
-        else:
-            prob = 1
-        
-
-        if prob < .5:
-            return False
-        
-        else:
-            d = [2,3,4,5,6,2]
-            if value == 6:
-                quantity += 1
-                return (quantity, d[d.index(value) + 1])
-            elif value == 1:
-                return (quantity + 1, value)
-            else:
-                return (quantity, d[d.index(value) + 1])
-
-
-    def straight_bet(self, current_bet, total_dice):
-        hand = self.hand
-
         quantity, value = current_bet
+        jessies = True if value == 1 else False
 
-        total_needed = quantity
-        unknown_dice = total_dice - len(hand)
-
-        for die in hand:
-            if die.value == value or die.value == 1:
-                total_needed -= 1
-        
-        if total_needed > 0 and total_needed <= unknown_dice:
-            prob = self.retrieve_probability(total_needed, unknown_dice, straight=True)
-        elif total_needed > unknown_dice:
-            prob = 0
-        else:
-            prob = 1
-    
-
-        if prob < .5:
+        if self.prob(current_bet, total_dice, straight=straight, jessies=jessies) < .5:
             return False
-        elif self.one_left:
-            d = [1,2,3,4,5,6,1]
-            if value == 6:
-                quantity += 1
-            return (quantity, d[d.index(value) + 1])
         else:
-            return (quantity + 1, value)
-
+            return self.up_the_line(current_bet, total_dice, straight=straight, jessies=jessies)
 
     def starting_bet(self, average):
         quantity = math.floor(average - 1)
@@ -93,7 +37,8 @@ class ai_gen_onepointzero(AIPlayer):
 
 
 class ai_gen_onepointone(ai_gen_onepointzero):
-    '''Uses probabilities to call. And uses it to make bets.'''
+    '''Uses probabilities to call AND make bets.'''
+    
     def __init__(self, name='Gen 1.1', gen='1.1', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
     
@@ -166,11 +111,7 @@ class ai_gen_onepointone(ai_gen_onepointzero):
 
         return random.choice([x[0] for x in final])
 
-        
-
-    def straight_bet(self, current_bet, total_dice):
-        return self.bet(current_bet, total_dice, straight=True)
-
+    
 
 
 if __name__ == "__main__":

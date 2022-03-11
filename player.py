@@ -33,6 +33,7 @@ class Player:
     
 
 class AIPlayer(Player):
+    '''Comes with a prob method that, passed a bet and the total dice, returns the prob of that bet.'''
     def __init__(self, name=False, gen='ai', dice=5):
         super().__init__(name=name, gen=gen, dice=dice, ai=True)
 
@@ -94,6 +95,9 @@ class AIPlayer(Player):
             return 0
         else:
             return 1
+
+    
+
 
     
     

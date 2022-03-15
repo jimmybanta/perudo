@@ -6,6 +6,7 @@ from player import AIPlayer
 
 class ai_gen_onepointzero(ai_gen_zeropointzero):
     '''Uses probabilities to call. Doesn't use it to make any bets.'''
+
     def __init__(self, name='Gen 1.0', gen='1.0', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
 
@@ -89,6 +90,10 @@ class ai_gen_onepointone(ai_gen_onepointzero):
 
 
 class ai_gen_onepointtwo(ai_gen_onepointone):
+    """Uses probability to make a starting bet.
+    
+        Makes the starting bet that is the highest up the line 
+        (aka greatest value and quantity) that has a probability of at least 66%."""
     def __init__(self, name='Gen 1.2', gen='1.2', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
     
@@ -129,21 +134,23 @@ class ai_gen_onepointtwo(ai_gen_onepointone):
 
 
 class ai_gen_onepointthree(ai_gen_onepointtwo):
+    """Chooses to call or bet based off which has the best chance of working."""
+
     def __init__(self, name='Gen 1.3', gen='1.3', dice=5):
         super().__init__(name=name, gen=gen, dice=dice)
     
     def bet(self, current_bet, total_dice, straight=False):
         '''Returns False if it decides to call, otherwise returns a bet.
         
-            Makes a bet by choosing the highest-probability possible bet.'''
+            Decides to call or bet based off which has the best chance of working.'''
 
         value = current_bet[1]
         jessies = True if value == 1 else False
 
         first_prob = self.prob(current_bet, total_dice, straight=straight, jessies=jessies)
 
+        # make first_prob the probability that you would be correct in calling
         first_prob = 1 - first_prob
-        # first_prob is now the probability that you would be correct in calling
 
         straight_bets, normal_bets = self.possible_bets(current_bet, straight=straight, jessies=jessies)
 
@@ -161,6 +168,37 @@ class ai_gen_onepointthree(ai_gen_onepointtwo):
             return random.choice([x[0] for x in final])
 
 
+class ai_gen_onepointfour(ai_gen_onepointthree):
+    '''Changed starting bet to be 100% safe.'''
+
+    def __init__(self, name='Gen 1.4', gen='1.4', dice=5):
+        super().__init__(name=name, gen=gen, dice=dice)
+
+    def starting_bet(self, total_dice, straight=False):
+    
+        bets = self.possible_starting_bets(total_dice, straight=straight)
+
+        bets.sort(reverse=True)
+
+        return bets[0]
+    
+
+    def possible_starting_bets(self, total_dice, straight=False):
+        bets = []
+
+        if straight:
+            for i in range(1,7):
+                count = self.hand.count(i)
+                if count > 0:
+                    bets.append((count, i))
+            
+        else:
+            for i in range(2,7):
+                count = self.hand.count(i) + self.hand.count(1)
+                if count > 0:
+                    bets.append((count, i))
+        
+        return bets
 
 
         
@@ -171,10 +209,11 @@ class ai_gen_onepointthree(ai_gen_onepointtwo):
 
 if __name__ == "__main__":
 
-    player = ai_gen_onepointthree()
+    player = ai_gen_onepointfour()
     player.roll()
+    print(player.hand)
     
-    print(player.bet((4,3), 15))
+    print(player.starting_bet(20, straight=True))
     
 
 

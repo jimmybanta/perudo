@@ -5,14 +5,17 @@ from game import Game, Round
 from ai_gen_zero import ai_gen_test, ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropointseven, ai_gen_zeropointeight
 from ai_gen_one import ai_gen_onepointfour, ai_gen_onepointzero, ai_gen_onepointone, ai_gen_onepointtwo, ai_gen_onepointthree
+from ai_gen_two import ai_gen_twopointzero, ai_gen_twopointone, ai_gen_twopointtwo, ai_gen_twopointthree
+from ai_gen_two import ai_gen_twopointthreepointone, ai_gen_twopointthreepointtwo, ai_gen_twopointthreepointthree, ai_gen_twopointthreepointfour
 
 NO_DICE = 5
 
-AIS = [ai_gen_onepointfour(dice=NO_DICE),
-        ai_gen_onepointthree(dice=NO_DICE),
-        ai_gen_onepointtwo(dice=NO_DICE),
-        ai_gen_onepointone(dice=NO_DICE),
-        ai_gen_onepointzero(dice=NO_DICE)]
+AIS = [ai_gen_twopointthree(dice=NO_DICE),
+        ai_gen_twopointtwo(dice=NO_DICE),
+        ai_gen_twopointone(dice=NO_DICE),
+        ai_gen_twopointzero(dice=NO_DICE),
+        ai_gen_onepointfour(dice=NO_DICE)]
+
 
 
 

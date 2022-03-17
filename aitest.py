@@ -17,10 +17,7 @@ NO_DICE = 5
 
 AI = ai_gen_twopointfivepointfive(dice=NO_DICE)
 
-CONTROL_GROUP = [ai_gen_twopointtwo(dice=NO_DICE),
-            ai_gen_onepointtwo(dice=NO_DICE), 
-            ai_gen_onepointzero(dice=NO_DICE),
-            ai_gen_zeropointsix(dice=NO_DICE)]
+CONTROL_GROUP = [ai_gen_onepointfour(dice=NO_DICE)]
 
 
 

@@ -86,7 +86,7 @@ class AIGame(AITest):
 
 if __name__ == '__main__':
 
-    game_set = GameSet(2500)
+    game_set = GameSet(10000)
 
     game_set.run()
 

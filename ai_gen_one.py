@@ -166,6 +166,7 @@ class ai_gen_onepointthree(ai_gen_onepointtwo):
         else:
             final = [x for x in final if x[1] == second_prob]
             return random.choice([x[0] for x in final])
+            
 
 
 class ai_gen_onepointfour(ai_gen_onepointthree):

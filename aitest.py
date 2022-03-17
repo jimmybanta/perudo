@@ -7,14 +7,21 @@ from ai_gen_zero import ai_gen_zeropointfive, ai_gen_zeropointsix, ai_gen_zeropo
 from ai_gen_one import ai_gen_onepointfour, ai_gen_onepointzero, ai_gen_onepointone, ai_gen_onepointtwo, ai_gen_onepointthree
 from ai_gen_two import ai_gen_twopointzero, ai_gen_twopointone, ai_gen_twopointtwo, ai_gen_twopointthree
 from ai_gen_two import ai_gen_twopointthreepointone, ai_gen_twopointthreepointtwo, ai_gen_twopointthreepointthree, ai_gen_twopointthreepointfour
+from ai_gen_two import ai_gen_twopointfour, ai_gen_twopointfourpointone, ai_gen_twopointfourpointtwo, ai_gen_twopointfourpointthree, ai_gen_twopointfourpointfour
+from ai_gen_two import ai_gen_twopointfourpointfive, ai_gen_twopointfourpointsix
+from ai_gen_two import ai_gen_twopointfivepointone, ai_gen_twopointfivepointtwo, ai_gen_twopointfivepointthree, ai_gen_twopointfivepointfour, ai_gen_twopointfivepointfive
+
 
 NO_DICE = 5
 
-AIS = [ai_gen_twopointthree(dice=NO_DICE),
-        ai_gen_twopointtwo(dice=NO_DICE),
-        ai_gen_twopointone(dice=NO_DICE),
-        ai_gen_twopointzero(dice=NO_DICE),
-        ai_gen_onepointfour(dice=NO_DICE)]
+
+AI = ai_gen_twopointfivepointfive(dice=NO_DICE)
+
+CONTROL_GROUP = [ai_gen_twopointtwo(dice=NO_DICE),
+            ai_gen_onepointtwo(dice=NO_DICE), 
+            ai_gen_onepointzero(dice=NO_DICE),
+            ai_gen_zeropointsix(dice=NO_DICE)]
+
 
 
 
@@ -24,10 +31,14 @@ class AITest(Game):
     def __init__(self):
         super().__init__()
             
-        for player in AIS:
+        for player in CONTROL_GROUP:
             self.players[player] = NO_DICE
             self.order.append(player)
             player.dice = NO_DICE
+
+        self.players[AI] = NO_DICE
+        self.order.append(AI)
+        AI.dice = NO_DICE
         
         random.shuffle(self.order)
         

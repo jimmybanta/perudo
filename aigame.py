@@ -2,8 +2,10 @@ import random
 import pdb
 import matplotlib.pyplot as plt
 import datetime as dt
+from playsound import playsound
 
-from aitest import AITest, AIRound, NO_DICE, AIS
+
+from aitest import AITest, AIRound, NO_DICE, AI, CONTROL_GROUP
 from ai_gen_zero import ai_gen_zeropointzero, ai_gen_zeropointone, ai_gen_zeropointtwo, ai_gen_zeropointthree, ai_gen_zeropointfour
 
 
@@ -12,8 +14,12 @@ class GameSet:
         self.number = number
         self.results = {}
 
-        for ai in AIS:
+        self.results[AI] = 0
+
+        for ai in CONTROL_GROUP:
             self.results[ai] = 0
+        
+        
     
 
     def run(self):
@@ -43,6 +49,9 @@ class GameSet:
             print("{} --- {} wins --- Won {}% of games".format(str(player), 
                                                 self.results[player], 
                                                 round((self.results[player] / self.number) * 100), 2))
+            if player == AI:
+                print('')
+                print('Control Group:')
         print('')
 
     def analyze(self):
@@ -77,8 +86,13 @@ class AIGame(AITest):
 
 if __name__ == '__main__':
 
-    game_set = GameSet(5000)
+    game_set = GameSet(2500)
 
     game_set.run()
 
     game_set.print_results()
+
+    flagpole_sitta = '/Users/jimbo/Music/iTunes/iTunes Media/Music/Harvey Danger/Where Have All the Merrymakers Gone_/02 Flagpole Sitta.m4a'
+
+    playsound(flagpole_sitta)
+

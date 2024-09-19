@@ -8,6 +8,8 @@ from player import Player, AIPlayer
 
 NO_DICE = 5
 
+AIPLAYERS = []
+
 class Game:
     def __init__(self):
         self.players = {}
@@ -39,14 +41,14 @@ class HumanGame(Game):
     def __init__(self, num_players):
         super().__init__(num_players)
 
-        for i in range(num_players - 1):
-            ai_player = ai_gen_zeropointzero(i + 1, dice=NO_DICE)
-            self.players[ai_player] = NO_DICE
-            self.order.append(ai_player)
-            name = input('What is your name? ')
-            human_player = Player(name, dice=NO_DICE)
-            self.players[human_player] = NO_DICE
-            self.order.append(human_player)
+        for player in AIPLAYERS:
+            self.players[player] = NO_DICE
+            self.order.append(player)
+
+        name = input('What is your name? ')
+        human_player = Player(name, dice=NO_DICE)
+        self.players[human_player] = NO_DICE
+        self.order.append(human_player)
 
         random.shuffle(self.order)
 
@@ -252,7 +254,6 @@ class Round:
 
 if __name__ == '__main__':
 
-    game = Game(5, human=True)
-    game.play()
+    game = HumanGame()
     
     
